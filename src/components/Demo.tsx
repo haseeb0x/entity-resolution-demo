@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ComparisonPanel } from './ComparisonPanel';
+import { CustomInputForm } from './CustomInputForm';
 import { GraphPanel } from './GraphPanel';
 import { MechanismPanel } from './MechanismPanel';
 import { ScenarioSelector } from './ScenarioSelector';
@@ -73,11 +74,7 @@ export function Demo() {
           </>
         )}
 
-        {scenario?.id === 's6_custom' && (
-          <p className="rounded-md border border-dashed border-soft bg-stone-50 px-4 py-6 text-center text-sm text-stone-500">
-            Custom input form arrives in build step 9.
-          </p>
-        )}
+        {scenario?.id === 's6_custom' && <CustomInputForm />}
       </div>
     </section>
   );
