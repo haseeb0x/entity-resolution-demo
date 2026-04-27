@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  h1, h2, h3, h4 {
+    @apply font-sans;
+    color: #0c0a09;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h1 { font-size: 2.5rem; line-height: 1.15; }
+  h2 { font-size: 1.75rem; line-height: 1.25; }
+  h3 { font-size: 1.25rem; line-height: 1.3; }
+  code, pre, .mono {
+    font-family: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+}
+
+@layer utilities {
+  .container-prose {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .border-soft {
+    border-color: #E7E5E4;
+  }
+}
