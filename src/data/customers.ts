@@ -42,13 +42,16 @@ export const customers: Customer[] = [
   },
 
   // Scenario 3 — Transliteration variants.
-  // A Saudi customer whose ID was romanized as "Abdallah bin Muhammad",
-  // which is the same Arabic name as the watchlist entry "Abdullah Mohammed".
+  // A Saudi customer whose ID is romanized as "Abdallah Muhammad" — the
+  // same Arabic name as the watchlist entry "Abdullah Mohammed", written
+  // with a different English transliteration. The patronymic is stored in
+  // the family-name slot, which is how most KYC forms capture it when
+  // there's no separate family name.
   {
     id: 'cust_abdallah_riyadh',
     fullName: 'Abdallah bin Muhammad',
     givenNames: ['Abdallah'],
-    familyName: 'bin Muhammad',
+    familyName: 'Muhammad',
     arabicName: 'عبدالله بن محمد',
     dob: '1980',
     country: 'SA',

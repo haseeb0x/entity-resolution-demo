@@ -7,6 +7,7 @@
 import { findCustomer } from '@/data/customers';
 import { findScenario, scenarios } from '@/data/scenarios';
 import { findWatchlistEntry } from '@/data/watchlist';
+import { arabicNormalize } from './arabic-normalize';
 import { fellegiSunterMatch } from './fellegi-sunter';
 import { legacyMatch } from './legacy';
 
@@ -21,8 +22,8 @@ const expectedByScenario: Record<string, Expected> = {
   s2_vessel_vs_person: { legacy: 'FLAG', fs: 'CLEAR' },
   s3_transliteration: {
     legacy: 'CLEAR',
-    fs: 'CLEAR',
-    note: 'fs flips to FLAG once Arabic normalization is plugged in (step 7)',
+    fs: 'FLAG',
+    note: 'Arabic normalization canonicalizes the name; fs FLAGs (step 7)',
   },
   s4_true_positive: { legacy: 'FLAG', fs: 'FLAG' },
   s5_graph_disambiguation: {
@@ -47,7 +48,9 @@ export function runSmokeTest() {
       continue;
     }
     const legacy = legacyMatch(customer, entry);
-    const fs = fellegiSunterMatch(customer, entry);
+    const fs = fellegiSunterMatch(customer, entry, {
+      normalizeNameToken: arabicNormalize,
+    });
     const ok =
       legacy.verdict === expected.legacy && fs.verdict === expected.fs;
     total++;
@@ -62,7 +65,7 @@ export function runSmokeTest() {
   const s1 = findScenario('s1_common_name')!;
   const c = findCustomer(s1.customerId)!;
   const w = findWatchlistEntry(s1.watchlistEntryId)!;
-  const fs = fellegiSunterMatch(c, w);
+  const fs = fellegiSunterMatch(c, w, { normalizeNameToken: arabicNormalize });
   console.group('\n[smoke] Scenario 1 detailed weight table');
   console.table(
     fs.fields.map((f) => ({

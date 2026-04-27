@@ -6,6 +6,7 @@ import { TransactionContext } from './TransactionContext';
 import { findCustomer } from '@/data/customers';
 import { findScenario, scenarios } from '@/data/scenarios';
 import { findWatchlistEntry } from '@/data/watchlist';
+import { arabicNormalize } from '@/lib/matching/arabic-normalize';
 import { fellegiSunterMatch } from '@/lib/matching/fellegi-sunter';
 import { legacyMatch } from '@/lib/matching/legacy';
 
@@ -23,7 +24,9 @@ export function Demo() {
       customer,
       entry,
       legacy: legacyMatch(customer, entry),
-      fs: fellegiSunterMatch(customer, entry),
+      fs: fellegiSunterMatch(customer, entry, {
+        normalizeNameToken: arabicNormalize,
+      }),
     };
   }, [scenario]);
 

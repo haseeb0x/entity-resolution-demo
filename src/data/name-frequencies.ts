@@ -54,6 +54,10 @@ export const familyNameFrequencies: Record<string, number> = {
   ahmad: 0.025,
   ahmed: 0.025,
   mohammed: 0.04,
+  muhammad: 0.04, // canonical post-normalization
+  mohammad: 0.04,
+  abdullah: 0.015, // canonical post-normalization
+  abdallah: 0.012,
   hassan: 0.012,
   ali: 0.02,
   // Russian.
