@@ -60,7 +60,7 @@ export function Demo() {
         )}
 
         {data && (
-          <>
+          <div key={scenario?.id} className="scenario-enter space-y-6">
             <TransactionContext customer={data.customer} />
             <ComparisonPanel
               legacy={data.legacy}
@@ -71,10 +71,14 @@ export function Demo() {
             {scenario?.showGraph && data.graphContext && (
               <GraphPanel graphContext={data.graphContext} />
             )}
-          </>
+          </div>
         )}
 
-        {scenario?.id === 's6_custom' && <CustomInputForm />}
+        {scenario?.id === 's6_custom' && (
+          <div key="custom" className="scenario-enter">
+            <CustomInputForm />
+          </div>
+        )}
       </div>
     </section>
   );

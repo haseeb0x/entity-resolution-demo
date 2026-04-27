@@ -37,4 +37,26 @@
   .border-soft {
     border-color: #E7E5E4;
   }
+
+  @keyframes scenario-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .scenario-enter {
+    animation: scenario-fade-in 220ms ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scenario-enter {
+      animation: none;
+    }
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
