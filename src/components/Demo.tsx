@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { ComparisonPanel } from './ComparisonPanel';
+import { GraphPanel } from './GraphPanel';
 import { MechanismPanel } from './MechanismPanel';
 import { ScenarioSelector } from './ScenarioSelector';
 import { TransactionContext } from './TransactionContext';
 import { findCustomer } from '@/data/customers';
+import { graphData } from '@/data/graph-data';
 import { findScenario, scenarios } from '@/data/scenarios';
 import { findWatchlistEntry } from '@/data/watchlist';
 import { arabicNormalize } from '@/lib/matching/arabic-normalize';
 import { fellegiSunterMatch } from '@/lib/matching/fellegi-sunter';
+import { computeGraphContext } from '@/lib/matching/graph-context';
 import { legacyMatch } from '@/lib/matching/legacy';
 
 export function Demo() {
@@ -16,17 +19,22 @@ export function Demo() {
 
   const data = useMemo(() => {
     if (!scenario) return null;
-    if (scenario.id === 's6_custom') return null; // wired in step 9
+    if (scenario.id === 's6_custom') return null;
     const customer = findCustomer(scenario.customerId);
     const entry = findWatchlistEntry(scenario.watchlistEntryId);
     if (!customer || !entry) return null;
+    const graphContext = scenario.showGraph
+      ? computeGraphContext(customer, entry, graphData)
+      : undefined;
     return {
       customer,
       entry,
       legacy: legacyMatch(customer, entry),
       fs: fellegiSunterMatch(customer, entry, {
         normalizeNameToken: arabicNormalize,
+        graphContext,
       }),
+      graphContext,
     };
   }, [scenario]);
 
@@ -59,6 +67,9 @@ export function Demo() {
               watchlistEntry={data.entry}
             />
             <MechanismPanel result={data.fs} />
+            {scenario?.showGraph && data.graphContext && (
+              <GraphPanel graphContext={data.graphContext} />
+            )}
           </>
         )}
 

@@ -5,10 +5,12 @@
 // is reachable at the current step.
 
 import { findCustomer } from '@/data/customers';
+import { graphData } from '@/data/graph-data';
 import { findScenario, scenarios } from '@/data/scenarios';
 import { findWatchlistEntry } from '@/data/watchlist';
 import { arabicNormalize } from './arabic-normalize';
 import { fellegiSunterMatch } from './fellegi-sunter';
+import { computeGraphContext } from './graph-context';
 import { legacyMatch } from './legacy';
 
 interface Expected {
@@ -28,8 +30,8 @@ const expectedByScenario: Record<string, Expected> = {
   s4_true_positive: { legacy: 'FLAG', fs: 'FLAG' },
   s5_graph_disambiguation: {
     legacy: 'FLAG',
-    fs: 'FLAG',
-    note: 'flips to CLEAR once graph context is plugged in (step 8)',
+    fs: 'CLEAR',
+    note: 'graph context (zero shared neighbors) flips fs to CLEAR (step 8)',
   },
 };
 
@@ -48,8 +50,12 @@ export function runSmokeTest() {
       continue;
     }
     const legacy = legacyMatch(customer, entry);
+    const graphContext = s.showGraph
+      ? computeGraphContext(customer, entry, graphData)
+      : undefined;
     const fs = fellegiSunterMatch(customer, entry, {
       normalizeNameToken: arabicNormalize,
+      graphContext,
     });
     const ok =
       legacy.verdict === expected.legacy && fs.verdict === expected.fs;
