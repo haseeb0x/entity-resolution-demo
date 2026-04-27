@@ -1,73 +1,110 @@
-# React + TypeScript + Vite
+# Entity Resolution Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive single-page demo that walks a reader through six scenarios in
+which a legacy compliance name-matching system disagrees with an entity
+resolution model — and shows the math behind each disagreement.
 
-Currently, two official plugins are available:
+> **Live demo:** _add Cloudflare Pages URL after deploy._
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Why this exists
 
-## React Compiler
+False positive rates in compliance screening are a known industry problem —
+roughly 95–98% of alerts on common configurations are noise. The cost of
+that noise is concentrated unevenly: customers with common Arabic and Muslim
+names bear it disproportionately, because the same name-matching algorithms
+that work passably on rare Western European names collapse against
+population-frequency-scale collisions on names like Muhammad, Ahmad, or
+Abdullah.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Entity resolution treats name as one signal among several. Date of birth,
+country, entity type, identifying numbers, and graph context all contribute
+log-odds weights to a final match probability. Each signal's weight scales
+with how informative it is — a Muhammad match is worth less than a Yevgeny
+match because Muhammad is far more common in the population.
 
-## Expanding the ESLint configuration
+## What it demonstrates
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Six scenarios, each with the same input fed to both systems:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **Common name collision.** A Toronto software engineer named Muhammad
+   Ahmad Al-Rashidi vs. a sanctioned individual of the same given names in
+   Yemen. The legacy system flags. Entity resolution clears.
+2. **Vessel vs. person.** A retail customer named Carmela vs. a sanctioned
+   Iranian-flagged vessel of the same name. Legacy flags; entity resolution
+   clears on entity-type mismatch.
+3. **Transliteration variants.** "Abdallah bin Muhammad" and "Abdullah
+   Mohammed" — the same Arabic name, different romanizations. Legacy
+   _misses_ (false negative). Entity resolution catches it after Arabic
+   normalization.
+4. **True positive.** A record matching Yevgeny Prigozhin on every field.
+   Both systems flag. The point: entity resolution is not silently lenient.
+5. **Graph disambiguation.** Two Ali Hassans, same DOB, same country,
+   completely disjoint counterparty networks. Legacy flags; entity
+   resolution clears on graph context.
+6. **Custom input.** Type a name, DOB, and country. Run both matchers.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## How it works
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Stack:** Vite + React 18 + TypeScript + Tailwind v3. No backend, no API,
+  no auth — every line runs in the browser.
+- **Matching:** A hand-rolled Jaro–Winkler implementation for the legacy
+  baseline, and a hand-rolled Fellegi–Sunter probabilistic record linkage
+  model for entity resolution. Per-field _m_ and _u_ parameters are
+  documented in `src/lib/matching/fellegi-sunter.ts`. Arabic name
+  canonicalization is in `src/lib/matching/arabic-normalize.ts`. Graph
+  context (Scenario 5 only) is in `src/lib/matching/graph-context.ts`.
+- **Data:** ~28 illustrative watchlist entries modelled on the public
+  [OFAC SDN list](https://sanctionslist.ofac.treas.gov), plus six synthetic
+  customer records and a small entity graph for Scenario 5.
+
+The math is exposed: every scenario's mechanism panel has a "View the full
+math" toggle that shows the Fellegi–Sunter weight table — every field, its
+_m_ / _u_ values, and its contribution to the final log-odds.
+
+## Disclaimers
+
+- **Synthetic customers.** All customer records are invented. No real persons
+  are described.
+- **Illustrative watchlist.** Watchlist entries are modelled on the public
+  OFAC SDN list. Some reference deceased or widely documented designees;
+  others are representative samples. This is not a live screening source.
+  Inclusion on the SDN list represents U.S. Treasury designation, not
+  criminal conviction.
+- **Demonstration only.** This is a teaching demo, not a compliance system.
+  The _m_ and _u_ parameters are calibrated for narrative clarity, not
+  empirical fit on a particular population.
+
+## Run locally
+
+```sh
+npm install
+npm run dev   # Vite dev server on http://localhost:5173
+npm run smoke # Run the headless verdict-matrix sanity check
+npm run build # Production build into ./dist
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Deploy
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The repo deploys to Cloudflare Pages with these settings:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Build command:** `npm run build`
+- **Build output directory:** `dist`
+- **Root directory:** project root
+- **Node version:** 20+
+
+Connect the GitHub repo to Cloudflare Pages and any push to `main` rebuilds
+and republishes automatically.
+
+## Further reading
+
+- [`docs/full-report.md`](docs/full-report.md) — the long-form write-up.
+- [`docs/exec-summary.md`](docs/exec-summary.md) — five-minute version.
+- [Splink's Fellegi–Sunter docs](https://moj-analytical-services.github.io/splink/topic_guides/theory/fellegi_sunter.html)
+  — production-grade open-source record linkage library; the model used here
+  is a hand-rolled version of the same approach.
+- [OFAC SDN list](https://sanctionslist.ofac.treas.gov) — the public source
+  list this demo's watchlist is modelled on.
+
+## License
+
+[MIT](LICENSE).
