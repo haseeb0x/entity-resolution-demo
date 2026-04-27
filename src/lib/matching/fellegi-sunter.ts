@@ -50,12 +50,14 @@ export interface ScoringConfig {
 }
 
 export const DEFAULT_CONFIG: ScoringConfig = {
-  // Names: m is moderate because transliteration / typos / OCR errors
-  // routinely cause the same person's name to be spelled differently across
-  // records. Real systems often pair this with fuzzy matching (we do that
-  // separately via Arabic normalization in step 7).
-  m_given: 0.85,
-  m_family: 0.85,
+  // Names: comparison happens after a canonicalization pre-pass (Arabic
+  // normalization in step 7; identity for Latin names). Given canonical
+  // names, agreement between same-person records is high. We use m = 0.99
+  // so that *canonical* name disagreement carries genuine evidential weight
+  // — without that, attribute matches (DOB + country + type) can dominate
+  // and produce false positives on records whose names visibly differ.
+  m_given: 0.99,
+  m_family: 0.99,
   // DOB: highly stable when present.
   m_dob: 0.99,
   // Approximate uniform u across plausible ~80-year window of relevant DOBs.
