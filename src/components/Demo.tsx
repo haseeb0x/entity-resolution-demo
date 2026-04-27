@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ComparisonPanel } from './ComparisonPanel';
+import { MechanismPanel } from './MechanismPanel';
 import { ScenarioSelector } from './ScenarioSelector';
 import { TransactionContext } from './TransactionContext';
 import { findCustomer } from '@/data/customers';
@@ -54,6 +55,7 @@ export function Demo() {
               entityResolution={data.fs}
               watchlistEntry={data.entry}
             />
+            <MechanismPanel result={data.fs} />
           </>
         )}
 
