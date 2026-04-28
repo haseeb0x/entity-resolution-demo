@@ -5,14 +5,15 @@ export function Hook() {
         An interactive teaching demo
       </p>
       <h1 className="mt-4 text-balance text-5xl font-semibold leading-[1.1] sm:text-6xl">
-        98% of compliance alerts are false positives.
-        <span className="text-flag"> For Muslim and Arabic names, it&apos;s worse.</span>
+        <span className="text-flag">Banking While Muslim Is A Nightmare.</span>{' '}
+        Muslim and Arabic names get flagged, screened, and debanked at rates
+        far higher than others.
       </h1>
       <p className="mt-8 max-w-prose text-lg leading-relaxed text-stone-700">
-        Legacy compliance systems compare names. Entity resolution compares
-        people. The difference is the gap between flagging every Muhammad in
-        Toronto and flagging the one your bank actually owes a suspicious
-        activity report on.
+        But is that simple prejudice, or a structural problem with compliance
+        screening? Legacy compliance systems compare names. Entity resolution
+        compares people. The difference is between flagging every Ahmad Khan
+        in Toronto and flagging the entity OFAC actually has on its list.
       </p>
       <p className="mt-4 max-w-prose text-stone-600">
         This page walks through six small scenarios. The same input goes to
