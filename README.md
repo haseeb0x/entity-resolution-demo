@@ -1,10 +1,13 @@
 # Entity Resolution Demo
 
-An interactive single-page demo that walks a reader through six scenarios in
-which a legacy compliance name-matching system disagrees with an entity
-resolution model — and shows the math behind each disagreement.
+An interactive single-page demo in which six Arabic and Muslim names 
+enter a legacy string-matching screener and an entity resolution model side by side
+— exposing, scenario by scenario, the structural mechanics by which compliant systems manufacture false positives at scale.
 
-> **Live demo:** _add Cloudflare Pages URL after deploy._
+> **Live demo:**: https://entity-resolution-demo.servicesforhaseeb.workers.dev
+
+Full report is available on request, detailing exact statistics, costs, solutions, and specific algorithms.
+
 
 ## Why this exists
 
@@ -74,36 +77,6 @@ _m_ / _u_ values, and its contribution to the final log-odds.
   The _m_ and _u_ parameters are calibrated for narrative clarity, not
   empirical fit on a particular population.
 
-## Run locally
-
-```sh
-npm install
-npm run dev   # Vite dev server on http://localhost:5173
-npm run smoke # Run the headless verdict-matrix sanity check
-npm run build # Production build into ./dist
-```
-
-## Deploy
-
-The repo deploys to Cloudflare Pages with these settings:
-
-- **Build command:** `npm run build`
-- **Build output directory:** `dist`
-- **Root directory:** project root
-- **Node version:** 20+
-
-Connect the GitHub repo to Cloudflare Pages and any push to `main` rebuilds
-and republishes automatically.
-
-## Further reading
-
-- [`docs/full-report.md`](docs/full-report.md) — the long-form write-up.
-- [`docs/exec-summary.md`](docs/exec-summary.md) — five-minute version.
-- [Splink's Fellegi–Sunter docs](https://moj-analytical-services.github.io/splink/topic_guides/theory/fellegi_sunter.html)
-  — production-grade open-source record linkage library; the model used here
-  is a hand-rolled version of the same approach.
-- [OFAC SDN list](https://sanctionslist.ofac.treas.gov) — the public source
-  list this demo's watchlist is modelled on.
 
 ## License
 
