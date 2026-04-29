@@ -1,58 +1,4 @@
-# Entity resolution for compliance screening: a teaching report
-
-This document is the long-form companion to the interactive demo. It
-covers: the false-positive problem, why it's worse for Arabic and Muslim
-names, the Fellegi–Sunter probabilistic record-linkage model used by the
-demo's entity-resolution component, the role of graph context, and the
-practical question of how an existing legacy screening stack can be
-migrated without disrupting compliance coverage.
-
-## 1. The false-positive problem
-
-A bank running a name-only sanctions screening system applies a string
-similarity score (Jaro–Winkler, Levenshtein, soundex variants) to every
-customer × watchlist pair and flags pairs above some threshold. Public
-industry write-ups consistently put the false positive rate on these
-configurations between 95% and 98% — that is, roughly 1 in every 20 to 50
-alerts represents an actual designated person.
-
-The cost of this noise has two components. The direct cost is L1 analyst
-time: every alert is investigated, even the obvious false positives.
-Industry estimates put the marginal review cost at $5–$30 per alert
-depending on tier and jurisdiction; at large institutions this aggregates
-to hundreds of millions of dollars per year. The indirect cost is
-distributional: the noise is concentrated on customers whose names happen
-to collide most often with the watchlist's most common names.
-
-## 2. Why it's worse for Arabic and Muslim names
-
-Two compounding effects:
-
-1. **Population frequency.** "Muhammad" is the most common given name in
-   the world; "Ahmad" and "Ali" are not far behind. Every Muhammad on a
-   sanctions list collides with every Muhammad on the customer book. A
-   threshold-based string-similarity matcher cannot distinguish "Muhammad
-   the sanctioned individual" from "Muhammad the customer" because the
-   matching is name-only — and on a population scale, hundreds or
-   thousands of customers may legitimately share the same name with a
-   sanctioned individual.
-
-2. **Transliteration variability.** Arabic-to-English transliteration is
-   not standardized. "Abdullah" and "Abdallah" come from the same Arabic
-   name (عبدالله). Same for "Muhammad / Mohammed / Mohammad / Muhamed",
-   "Ahmad / Ahmed", "Yusuf / Yousef / Yousuf". A string-similarity
-   matcher applied without canonicalization fails in *both* directions:
-   it reports false positives when two unrelated common names happen to
-   look similar, *and* false negatives when the same Arabic name is
-   romanized differently across records.
-
-The customer-experience consequence is straightforward: a customer named
-Muhammad gets transactional friction at every step that a customer named
-John does not, for the same underlying activity. The compliance
-consequence is more subtle: false negatives (Scenario 3 in the demo)
-mean the system silently misses some real matches.
-
-## 3. The Fellegi–Sunter model
+## The Fellegi–Sunter model
 
 The probabilistic record-linkage framework introduced by Fellegi and
 Sunter in 1969 is the standard alternative. The model treats name as one
@@ -83,7 +29,7 @@ The `u` parameters for names come from a small frequency table modelled on
 published anthroponymic studies; for other fields they are derived from
 the watchlist + customer population structure.
 
-## 4. The role of canonicalization
+## The role of canonicalization
 
 The Fellegi–Sunter model assumes field-level agreement is a binary signal.
 For names, this requires a canonicalization step that maps spelling
@@ -100,7 +46,7 @@ canonicalization: it not only reduces false positives ("Abdallah" and
 negatives (a customer ID romanized one way and a watchlist entry
 romanized another way are correctly recognized as the same Arabic name).
 
-## 5. The role of graph context
+## 5. Graph context
 
 Even with frequency-aware name weighting, some scenarios escape attribute
 matching. The demo's Scenario 5 is the canonical case: two people share
@@ -161,13 +107,3 @@ itself and requires deeper validation against a labelled holdout.
 
 Each of these is a substantial body of work. The demo is deliberately
 narrow: it shows the core matching problem and the core matching fix.
-
-## 8. References
-
-- Fellegi, I. P., & Sunter, A. B. (1969). _A theory for record linkage._
-  Journal of the American Statistical Association, 64(328), 1183–1210.
-- Splink — open-source probabilistic record linkage:
-  <https://moj-analytical-services.github.io/splink/>
-- OFAC SDN list — public source for the demo's watchlist:
-  <https://sanctionslist.ofac.treas.gov>
-- BGN/PCGN romanization systems for Arabic.
