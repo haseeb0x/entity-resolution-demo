@@ -1,13 +1,10 @@
 # **I**mproved **S**creening for **M**uslims
 
-> Demo: https://entity-resolution-demo.servicesforhaseeb.workers.dev/
-> Full Report: Available on request.
+https://entity-resolution-demo.servicesforhaseeb.workers.dev
 
 A demo of *Ism* (Improved Screening for Muslims), showcasing techniques which can be implemented into financial compliance screening software for more accurate entity-matching, and better customer outcomes for individuals with Arabic/Muslim names. Six Arabic & Muslim names are compared with a legacy string-matching screener, showing the structural mechanics by which compliance systems manufacture false positives at scale, leading to debanking of Muslims.
 
-**Live demo:** https://entity-resolution-demo.servicesforhaseeb.workers.dev
-
-> Full report is available on request, detailing context, statistics, costs, and the techniques used to create this solution. This is a demo of a working solution being implemented into a new payment facilitator. See Disclaimers at bottom.
+> Full report is available on request, detailing the problem & context, including an exploration of possible technique considered to create this solution. This is a demo of a working solution being implemented into a new payment facilitator. Scroll down to see Disclaimer. 
 
 ### The Problem
 
