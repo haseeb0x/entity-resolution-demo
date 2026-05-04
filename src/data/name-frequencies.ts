@@ -36,6 +36,11 @@ export const givenNameFrequencies: Record<string, number> = {
   dmitry: 0.0005,
   yevgeny: 0.00012,
   ramzan: 0.00005,
+  // Additional Arabic / Muslim given names.
+  fatima: 0.015,
+  noor: 0.008,
+  ismail: 0.005,
+  ayman: 0.003,
   // Hispanic.
   jose: 0.015,
   maria: 0.020,
@@ -60,6 +65,12 @@ export const familyNameFrequencies: Record<string, number> = {
   abdallah: 0.012,
   hassan: 0.012,
   ali: 0.02,
+  // Additional Arabic / Muslim family names.
+  khan: 0.015,
+  ibrahim: 0.005,
+  rahman: 0.008,
+  yusuf: 0.006,
+  omar: 0.008,
   // Russian.
   prigozhin: 0.000001,
   utkin: 0.0001,

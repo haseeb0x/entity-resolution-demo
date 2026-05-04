@@ -20,19 +20,9 @@ function Footer() {
     <footer className="border-t border-soft bg-stone-50">
       <div className="container-prose py-10 text-sm text-stone-600">
         <p>
-          Watchlist entries are illustrative samples modelled on the public
-          OFAC SDN list. Customer records are synthetic. This is a teaching
-          demo, not a screening system.
-        </p>
-        <p className="mt-2">
-          Built as a portfolio piece. Source on{' '}
-          <a
-            href="https://github.com/"
-            className="underline-offset-4 hover:underline"
-          >
-            GitHub
-          </a>
-          .
+          This is a demonstration of a screening engine, not to be used in
+          production. Watchlist entries are modelled on the public OFAC SDN
+          list. All customer records are synthetic.
         </p>
       </div>
     </footer>

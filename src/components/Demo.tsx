@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ComparisonPanel } from './ComparisonPanel';
-import { CustomInputForm } from './CustomInputForm';
+import { CustomerSelector } from './CustomerSelector';
 import { GraphPanel } from './GraphPanel';
 import { MechanismPanel } from './MechanismPanel';
 import { ScenarioSelector } from './ScenarioSelector';
@@ -20,7 +20,7 @@ export function Demo() {
 
   const data = useMemo(() => {
     if (!scenario) return null;
-    if (scenario.id === 's6_custom') return null;
+    if (scenario.id === 's6_database') return null;
     const customer = findCustomer(scenario.customerId);
     const entry = findWatchlistEntry(scenario.watchlistEntryId);
     if (!customer || !entry) return null;
@@ -52,7 +52,7 @@ export function Demo() {
       <div className="space-y-6">
         <ScenarioSelector activeId={activeId} onChange={setActiveId} />
 
-        {scenario && scenario.id !== 's6_custom' && (
+        {scenario && scenario.id !== 's6_database' && (
           <p className="rounded-md border border-soft bg-stone-50 px-4 py-3 text-sm text-stone-700">
             <span className="font-medium text-stone-900">Teaching point. </span>
             {scenario.teachingPoint}
@@ -74,9 +74,9 @@ export function Demo() {
           </div>
         )}
 
-        {scenario?.id === 's6_custom' && (
-          <div key="custom" className="scenario-enter">
-            <CustomInputForm />
+        {scenario?.id === 's6_database' && (
+          <div key="database" className="scenario-enter">
+            <CustomerSelector />
           </div>
         )}
       </div>

@@ -57,14 +57,14 @@ export const scenarios: Scenario[] = [
     showGraph: true,
   },
   {
-    id: 's6_custom',
-    label: '6. Custom input',
+    id: 's6_database',
+    label: '6. Screen a customer',
     description:
-      'Type a name, DOB, and country. The same comparison runs against the bundled watchlist.',
+      'Select from twenty customer profiles — ordinary people whose names collide with OFAC SDN entries. Each runs through both screening systems with full graph context.',
     customerId: '',
     watchlistEntryId: '',
     teachingPoint:
-      'The same matching logic applies to arbitrary input. "No matches found" is itself a useful outcome.',
+      'Every person below is fictional. Every name collision is real — these are the most common Arabic and Muslim name patterns on the OFAC SDN list.',
     showGraph: false,
   },
 ];

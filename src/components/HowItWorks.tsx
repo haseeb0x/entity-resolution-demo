@@ -6,7 +6,7 @@ import {
   ScanSearch,
   ShieldCheck,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 
 export function HowItWorks() {
   return (
@@ -77,26 +77,8 @@ export function HowItWorks() {
           </ul>
         </div>
 
-        <div>
-          <h3>Read more</h3>
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <ReadCard
-              title="Full report"
-              body="The long-form write-up with citations and methodology."
-              href="https://github.com/"
-            />
-            <ReadCard
-              title="Executive summary"
-              body="A 5-minute version for non-technical stakeholders."
-              href="https://github.com/"
-            />
-            <ReadCard
-              title="Source code"
-              body="Everything on this page is open source. Read the matching logic line by line."
-              href="https://github.com/"
-            />
-          </div>
-        </div>
+        {/* Read more section removed — this is a screening engine demo,
+            not a portfolio landing page. */}
       </div>
     </section>
   );
@@ -122,31 +104,3 @@ function Step({
   );
 }
 
-function ReadCard({
-  title,
-  body,
-  href,
-}: {
-  title: string;
-  body: string;
-  href: string;
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-stone-600">{body}</p>
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-3 inline-block text-sm font-medium text-stone-900 underline-offset-4 hover:underline"
-        >
-          Open →
-        </a>
-      </CardContent>
-    </Card>
-  );
-}

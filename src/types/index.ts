@@ -20,6 +20,14 @@ export interface Entity {
   geography?: string[];
 }
 
+/** Fields that map to what a bank/PSP analyst sees on their dashboard. */
+export interface CustomerProfile {
+  occupation?: string;
+  city?: string;
+  accountAge?: string;
+  kycVerification?: string;
+}
+
 export interface WatchlistEntry extends Entity {
   listSource: 'OFAC_SDN' | 'UN' | 'EU' | 'HMT';
   sanctionsProgram?: string;
@@ -27,7 +35,7 @@ export interface WatchlistEntry extends Entity {
   isSynthetic: false;
 }
 
-export interface Customer extends Entity {
+export interface Customer extends Entity, CustomerProfile {
   isSynthetic: true;
   transactionDescription: string;
   transactionAmount?: number;

@@ -5,6 +5,7 @@
 // is reachable at the current step.
 
 import { findCustomer } from '@/data/customers';
+import { customerDatabase } from '@/data/customer-database';
 import { graphData } from '@/data/graph-data';
 import { findScenario, scenarios } from '@/data/scenarios';
 import { findWatchlistEntry } from '@/data/watchlist';
@@ -12,6 +13,7 @@ import { arabicNormalize } from './arabic-normalize';
 import { fellegiSunterMatch } from './fellegi-sunter';
 import { computeGraphContext } from './graph-context';
 import { legacyMatch } from './legacy';
+import { screenCustomer } from './screen';
 
 interface Expected {
   legacy: 'FLAG' | 'CLEAR';
@@ -40,7 +42,7 @@ export function runSmokeTest() {
   let passed = 0;
   let total = 0;
   for (const s of scenarios) {
-    if (s.id === 's6_custom') continue;
+    if (s.id === 's6_custom' || s.id === 's6_database') continue;
     const expected = expectedByScenario[s.id];
     if (!expected) continue;
     const customer = findCustomer(s.customerId);
@@ -86,5 +88,25 @@ export function runSmokeTest() {
   console.log(`Σ log-odds = ${fs.totalLogOdds.toFixed(3)}`);
   console.log(`P(match) = ${(fs.matchProbability * 100).toFixed(2)}%`);
   console.groupEnd();
+  console.groupEnd();
+
+  // 20-person database sweep: every customer should be FLAG by legacy, CLEAR by ER.
+  console.group('\n[smoke] 20-person customer database');
+  let dbPass = 0;
+  for (const cust of customerDatabase) {
+    const res = screenCustomer(cust);
+    const legVerdict = res.legacy ? 'FLAG' : 'CLEAR';
+    const erVerdict = res.entityResolution ? 'FLAG' : 'CLEAR';
+    const ok = legVerdict === 'FLAG' && erVerdict === 'CLEAR';
+    if (ok) dbPass++;
+    const legSim = res.legacy ? ` sim=${res.legacy.result.similarity.toFixed(2)}` : '';
+    const erP = res.entityResolution
+      ? ` P=${(res.entityResolution.result.matchProbability * 100).toFixed(1)}%`
+      : '';
+    console.log(
+      `${ok ? '✓' : '✗'} ${cust.fullName.padEnd(22)} legacy=${legVerdict}${legSim}  er=${erVerdict}${erP}`,
+    );
+  }
+  console.log(`\n${dbPass}/${customerDatabase.length} customers: legacy FLAG, ER CLEAR.`);
   console.groupEnd();
 }

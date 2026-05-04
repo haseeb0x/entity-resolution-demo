@@ -1,9 +1,9 @@
-// Static SVG visualization of the two-cluster network for Scenario 5.
+// Dynamic SVG visualization of the two-cluster network.
 //
-// We hand-roll the layout instead of running a force simulation: the graph
-// has only ~10 nodes arranged in two intentionally disjoint clusters, and
-// deliberate positioning communicates the "no overlap" signal more clearly
-// than a physics-based layout. This also keeps the bundle small.
+// Accepts any customer × watchlist pair and extracts the relevant subgraph
+// from graphData, then lays it out in the same two-column style as the
+// original Scenario 5 visualization. This generalizes across all 20 customer
+// database profiles and the fixed Scenario 5.
 
 import { graphData } from '@/data/graph-data';
 import type { GraphResult } from '@/types';
@@ -11,49 +11,60 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Props {
   graphContext: GraphResult;
+  customerId?: string;
+  watchlistEntryId?: string;
+  customerLabel?: string;
+  watchlistLabel?: string;
 }
-
-const FOCAL_CUSTOMER = 'cust_ali_hassan_montreal';
-const FOCAL_WATCHLIST = 'ofac_ali_hassan_hezbollah';
 
 interface Pos {
   x: number;
   y: number;
 }
 
-function buildLayout(): Record<string, Pos> {
-  const positions: Record<string, Pos> = {};
-  positions[FOCAL_CUSTOMER] = { x: 200, y: 220 };
-  positions[FOCAL_WATCHLIST] = { x: 600, y: 220 };
+// Defaults for backward compatibility with Scenario 5.
+const DEFAULT_CUSTOMER = 'cust_ali_hassan_montreal';
+const DEFAULT_WATCHLIST = 'ofac_ali_hassan_hezbollah';
 
-  const customerNeighbors = graphData.edges
-    .filter((e) => e.source === FOCAL_CUSTOMER || e.target === FOCAL_CUSTOMER)
-    .map((e) => (e.source === FOCAL_CUSTOMER ? e.target : e.source));
-  const watchlistNeighbors = graphData.edges
-    .filter(
-      (e) => e.source === FOCAL_WATCHLIST || e.target === FOCAL_WATCHLIST,
-    )
-    .map((e) => (e.source === FOCAL_WATCHLIST ? e.target : e.source));
+function getNeighborIds(focalId: string): string[] {
+  const out: string[] = [];
+  for (const e of graphData.edges) {
+    if (e.source === focalId) out.push(e.target);
+    else if (e.target === focalId) out.push(e.source);
+  }
+  return out;
+}
+
+function buildLayout(
+  focalCustomer: string,
+  focalWatchlist: string,
+): Record<string, Pos> {
+  const positions: Record<string, Pos> = {};
+  positions[focalCustomer] = { x: 200, y: 220 };
+  positions[focalWatchlist] = { x: 600, y: 220 };
+
+  const customerNeighbors = getNeighborIds(focalCustomer);
+  const watchlistNeighbors = getNeighborIds(focalWatchlist);
 
   const radius = 130;
   customerNeighbors.forEach((id, i) => {
     const angle =
       Math.PI / 2 +
       (Math.PI * (i - (customerNeighbors.length - 1) / 2)) /
-        customerNeighbors.length;
+        Math.max(customerNeighbors.length, 1);
     positions[id] = {
-      x: positions[FOCAL_CUSTOMER]!.x - Math.cos(angle - Math.PI) * radius,
-      y: positions[FOCAL_CUSTOMER]!.y - Math.sin(angle - Math.PI) * radius,
+      x: positions[focalCustomer]!.x - Math.cos(angle - Math.PI) * radius,
+      y: positions[focalCustomer]!.y - Math.sin(angle - Math.PI) * radius,
     };
   });
   watchlistNeighbors.forEach((id, i) => {
     const angle =
       Math.PI / 2 +
       (Math.PI * (i - (watchlistNeighbors.length - 1) / 2)) /
-        watchlistNeighbors.length;
+        Math.max(watchlistNeighbors.length, 1);
     positions[id] = {
-      x: positions[FOCAL_WATCHLIST]!.x + Math.cos(angle - Math.PI) * radius,
-      y: positions[FOCAL_WATCHLIST]!.y - Math.sin(angle - Math.PI) * radius,
+      x: positions[focalWatchlist]!.x + Math.cos(angle - Math.PI) * radius,
+      y: positions[focalWatchlist]!.y - Math.sin(angle - Math.PI) * radius,
     };
   });
 
@@ -67,17 +78,37 @@ const COLORS = {
   'watchlist-neighbor': '#9F1239',
 };
 
-export function GraphPanel({ graphContext }: Props) {
-  const positions = buildLayout();
+export function GraphPanel({
+  graphContext,
+  customerId,
+  watchlistEntryId,
+  customerLabel,
+  watchlistLabel,
+}: Props) {
+  const focalCustomer = customerId ?? DEFAULT_CUSTOMER;
+  const focalWatchlist = watchlistEntryId ?? DEFAULT_WATCHLIST;
+  const positions = buildLayout(focalCustomer, focalWatchlist);
   const sharedCount = graphContext.sharedNeighbors.length;
+
+  // Build the subgraph: only edges/nodes relevant to these two focal nodes.
+  const relevantNodeIds = new Set(Object.keys(positions));
+  const relevantEdges = graphData.edges.filter(
+    (e) => relevantNodeIds.has(e.source) && relevantNodeIds.has(e.target),
+  );
+  const relevantNodes = graphData.nodes.filter((n) => relevantNodeIds.has(n.id));
+
+  const leftLabel = customerLabel ?? 'Customer\'s network';
+  const rightLabel = watchlistLabel ?? 'Sanctioned entity\'s network';
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Network context</CardTitle>
         <p className="mt-1 text-sm text-stone-600">
-          The customer and the sanctioned individual share name, birth year,
-          and country — but their counterparty graphs are disjoint.
+          Transaction counterparties and connected entities for each side.
+          The customer&apos;s graph is built from employer payroll, retail
+          purchases, utility payments, and verified KYC — the data a financial
+          institution accumulates over time.
         </p>
       </CardHeader>
       <CardContent>
@@ -85,7 +116,7 @@ export function GraphPanel({ graphContext }: Props) {
           <svg
             viewBox="0 0 800 440"
             role="img"
-            aria-label="Network graph showing two disjoint clusters"
+            aria-label="Network graph showing two clusters of counterparties"
             className="mx-auto w-full max-w-[760px]"
           >
             {/* Cluster labels */}
@@ -94,20 +125,24 @@ export function GraphPanel({ graphContext }: Props) {
               y={30}
               textAnchor="middle"
               className="fill-stone-700"
-              fontSize={13}
+              fontSize={12}
               fontWeight={600}
             >
-              Customer&apos;s network
+              {leftLabel.length > 28
+                ? leftLabel.slice(0, 26) + '…'
+                : leftLabel}
             </text>
             <text
               x={600}
               y={30}
               textAnchor="middle"
               className="fill-stone-700"
-              fontSize={13}
+              fontSize={12}
               fontWeight={600}
             >
-              Sanctioned entity&apos;s network
+              {rightLabel.length > 28
+                ? rightLabel.slice(0, 26) + '…'
+                : rightLabel}
             </text>
             {/* Cluster background tint */}
             <rect
@@ -127,7 +162,7 @@ export function GraphPanel({ graphContext }: Props) {
               rx={8}
             />
             {/* Edges */}
-            {graphData.edges.map((e, i) => {
+            {relevantEdges.map((e, i) => {
               const a = positions[e.source];
               const b = positions[e.target];
               if (!a || !b) return null;
@@ -144,11 +179,11 @@ export function GraphPanel({ graphContext }: Props) {
               );
             })}
             {/* Nodes */}
-            {graphData.nodes.map((n) => {
+            {relevantNodes.map((n) => {
               const p = positions[n.id];
               if (!p) return null;
               const focal =
-                n.id === FOCAL_CUSTOMER || n.id === FOCAL_WATCHLIST;
+                n.id === focalCustomer || n.id === focalWatchlist;
               const r = focal ? 11 : 7;
               const fill = COLORS[n.group as keyof typeof COLORS] ?? '#57534E';
               const labelOffset = focal ? 22 : 16;
@@ -159,7 +194,7 @@ export function GraphPanel({ graphContext }: Props) {
                     x={p.x}
                     y={p.y + labelOffset}
                     textAnchor="middle"
-                    fontSize={focal ? 12 : 11}
+                    fontSize={focal ? 12 : 10}
                     fontWeight={focal ? 600 : 400}
                     className="fill-stone-700"
                   >
@@ -170,17 +205,24 @@ export function GraphPanel({ graphContext }: Props) {
             })}
           </svg>
         </div>
-        <p className="mt-4 text-sm text-stone-700">
-          Shared neighbors: <span className="font-semibold">{sharedCount}</span>
-          {'.  '}Graph contribution to log-odds:{' '}
-          <span
-            className={`mono ${graphContext.contextScore >= 0 ? 'text-clear' : 'text-flag'}`}
-          >
-            {graphContext.contextScore >= 0 ? '+' : ''}
-            {graphContext.contextScore.toFixed(2)}
-          </span>
-          .
-        </p>
+        <div className="mt-4 space-y-2">
+          <p className="text-sm text-stone-700">
+            Shared neighbors: <span className="font-semibold">{sharedCount}</span>
+            {'.  '}Graph contribution to log-odds:{' '}
+            <span
+              className={`mono ${graphContext.contextScore >= 0 ? 'text-clear' : 'text-flag'}`}
+            >
+              {graphContext.contextScore >= 0 ? '+' : ''}
+              {graphContext.contextScore.toFixed(2)}
+            </span>
+            .
+          </p>
+          <p className="text-xs text-stone-500">
+            This graph grows over time as the financial institution receives more
+            transactions with this entity as a counterparty. More edges strengthen
+            the disambiguation signal.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
