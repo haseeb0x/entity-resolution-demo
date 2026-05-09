@@ -87,7 +87,7 @@ export function CustomerSelector() {
     useMemo(() => {
       if (!selected || !results) return null;
       // Prefer legacy match entry; fall back to best ER entry for graph display
-      const hit = results.legacy ?? results.bestEntityResolution;
+      const hit = results.legacy ?? results.pairedEntityResolution;
       if (!hit) return null;
       const entry = hit.bestEntry;
       const ctx = computeGraphContext(selected, entry, graphData);
@@ -137,10 +137,10 @@ export function CustomerSelector() {
                 body="No watchlist entry exceeded the 0.85 Jaro–Winkler threshold."
               />
             )}
-            {results.bestEntityResolution ? (
+            {results.pairedEntityResolution ? (
               <EntityResolutionResult
-                result={results.bestEntityResolution.result}
-                watchlistEntry={results.bestEntityResolution.bestEntry}
+                result={results.pairedEntityResolution.result}
+                watchlistEntry={results.pairedEntityResolution.bestEntry}
               />
             ) : (
               <NoHitCard
@@ -151,8 +151,8 @@ export function CustomerSelector() {
             )}
           </div>
 
-          {results.bestEntityResolution && (
-            <MechanismPanel result={results.bestEntityResolution.result} />
+          {results.pairedEntityResolution && (
+            <MechanismPanel result={results.pairedEntityResolution.result} />
           )}
 
           {/* Graph panel — shown for all 20 customers */}

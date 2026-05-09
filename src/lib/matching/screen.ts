@@ -30,9 +30,13 @@ export interface ScreenResult {
     bestEntry: WatchlistEntry;
     result: EntityResolutionResultData;
   } | null;
-  /** Always populated with the highest-scoring ER pair regardless of threshold.
-   *  Used to display the full Fellegi–Sunter card even when verdict is CLEAR. */
-  bestEntityResolution: {
+  /** ER result for the *same* watchlist entry that legacy flagged. This is
+   *  the comparison we always want to display: "Legacy says match. ER says
+   *  no." Picking the globally highest ER probability would show a random
+   *  entry (e.g. John Smith) because graph context penalizes the intended
+   *  collision target so heavily that unrelated entries without graph data
+   *  end up with higher (but still tiny) probabilities. */
+  pairedEntityResolution: {
     bestEntry: WatchlistEntry;
     result: EntityResolutionResultData;
   } | null;
@@ -75,6 +79,22 @@ export function screenCustomer(customer: Customer): ScreenResult {
       bestFs = { entry, result: fs };
     }
   }
+  // Compute the ER result for the same entry that legacy flagged, so the
+  // UI can show "Legacy flagged this pair → ER evaluated the same pair."
+  let paired: { bestEntry: WatchlistEntry; result: EntityResolutionResultData } | null = null;
+  if (bestLegacy && bestLegacy.result.similarity >= LEGACY_THRESHOLD) {
+    const entry = bestLegacy.entry;
+    const graphContext = computeGraphContext(customer, entry, graphData);
+    const useGraph =
+      graphContext.customerNeighbors.length > 0 &&
+      graphContext.watchlistNeighbors.length > 0;
+    const fs = fellegiSunterMatch(customer, entry, {
+      normalizeNameToken: arabicNormalize,
+      graphContext: useGraph ? graphContext : undefined,
+    });
+    paired = { bestEntry: entry, result: fs };
+  }
+
   return {
     legacy:
       bestLegacy && bestLegacy.result.similarity >= LEGACY_THRESHOLD
@@ -84,8 +104,6 @@ export function screenCustomer(customer: Customer): ScreenResult {
       bestFs && bestFs.result.matchProbability >= FS_THRESHOLD
         ? { bestEntry: bestFs.entry, result: bestFs.result }
         : null,
-    bestEntityResolution: bestFs
-      ? { bestEntry: bestFs.entry, result: bestFs.result }
-      : null,
+    pairedEntityResolution: paired,
   };
 }
