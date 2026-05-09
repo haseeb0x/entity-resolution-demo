@@ -45,14 +45,23 @@ for (const group of aliasGroups) {
 
 function stripPrefix(token: string): string {
   // Strip leading "al-" / "el-" definite article so that "al-Ahmad" matches
-  // "Ahmad". Hyphenated and non-hyphenated variants both handled.
-  return token.replace(/^al-?/i, '').replace(/^el-?/i, '');
+  // "Ahmad". Only strip when followed by a hyphen (al-Ahmad) or when the
+  // remainder is at least 3 characters (alrashidi → rashidi). This prevents
+  // mangling short names like "Ali" → "i" or "Aly" → "y".
+  return token
+    .replace(/^al-/i, '')
+    .replace(/^al(?=[a-z]{3})/i, '')
+    .replace(/^el-/i, '')
+    .replace(/^el(?=[a-z]{3})/i, '');
 }
 
 export function arabicNormalize(token: string): string {
   if (!token) return token;
   const lowered = token.toLowerCase().trim();
   if (stopwords.has(lowered)) return '';
+  // Check alias map before stripping the article prefix. Names like "ali"
+  // and "aly" are in the alias table and must not be prefix-stripped.
+  if (aliasToCanonical[lowered]) return aliasToCanonical[lowered];
   const stripped = stripPrefix(lowered);
   if (stopwords.has(stripped)) return '';
   return aliasToCanonical[stripped] ?? stripped;

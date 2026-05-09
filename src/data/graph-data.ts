@@ -154,6 +154,12 @@ export const graphData: GraphData = {
     { id: 'charity_islamic_relief', label: 'Islamic Relief UK', group: 'customer-neighbor' },
     { id: 'charity_muslim_aid', label: 'Muslim Aid', group: 'customer-neighbor' },
 
+    // Scenario 5 extra customer neighbors (deeper graph for stronger disjointness signal)
+    { id: 'bank_national', label: 'National Bank of Canada', group: 'customer-neighbor' },
+    { id: 'util_videotron', label: 'Vidéotron', group: 'customer-neighbor' },
+    { id: 'merch_jean_coutu', label: 'Jean Coutu', group: 'customer-neighbor' },
+    { id: 'merch_dollarama', label: 'Dollarama', group: 'customer-neighbor' },
+
     // ===================================================================
     // Original watchlist natural persons (Scenarios 1–4 + other colliders)
     // — these must also be in the graph so that graph context is available
@@ -191,6 +197,13 @@ export const graphData: GraphData = {
     { id: 'ofac_org_taliban', label: 'Taliban', group: 'watchlist-neighbor' },
     { id: 'ofac_shell_af_hawala', label: 'Kabul Money Exchange', group: 'watchlist-neighbor' },
     { id: 'ofac_shell_sa_front', label: 'Arabian Peninsula Relief', group: 'watchlist-neighbor' },
+
+    // Scenario 5 extra watchlist neighbors (deeper graph for stronger disjointness signal)
+    { id: 'ofac_shell_tyre_trading', label: 'Tyre Import-Export Co.', group: 'watchlist-neighbor' },
+    { id: 'ofac_shell_dahiyeh_exchange', label: 'Dahiyeh Exchange House', group: 'watchlist-neighbor' },
+    { id: 'ofac_shell_bekaa_construction', label: 'Bekaa Construction Ltd', group: 'watchlist-neighbor' },
+    { id: 'ofac_assoc_iran_quds_proxy', label: 'IRGC-QF Proxy Cell', group: 'watchlist-neighbor' },
+    { id: 'ofac_shell_sidon_shipping', label: 'Sidon Maritime Services', group: 'watchlist-neighbor' },
   ],
 
   edges: [
@@ -201,9 +214,18 @@ export const graphData: GraphData = {
     { source: 'cust_ali_hassan_montreal', target: 'merch_loblaws' },
     { source: 'cust_ali_hassan_montreal', target: 'util_hydro_quebec' },
     { source: 'cust_ali_hassan_montreal', target: 'merch_bell_canada' },
+    { source: 'cust_ali_hassan_montreal', target: 'bank_national' },
+    { source: 'cust_ali_hassan_montreal', target: 'util_videotron' },
+    { source: 'cust_ali_hassan_montreal', target: 'merch_jean_coutu' },
+    { source: 'cust_ali_hassan_montreal', target: 'merch_dollarama' },
     { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_org_hezbollah' },
     { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_shell_southlebanon_a' },
     { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_shell_southlebanon_b' },
+    { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_shell_tyre_trading' },
+    { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_shell_dahiyeh_exchange' },
+    { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_shell_bekaa_construction' },
+    { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_assoc_iran_quds_proxy' },
+    { source: 'ofac_ali_hassan_hezbollah', target: 'ofac_shell_sidon_shipping' },
 
     // ===================================================================
     // Customer database → legitimate counterparties

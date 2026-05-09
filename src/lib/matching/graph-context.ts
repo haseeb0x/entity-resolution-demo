@@ -7,11 +7,11 @@
 // is itself strong evidence that the two records describe different people
 // who happen to share a name.
 //
-// The contextScore is added directly to the total log-odds. The values here
-// are calibrated so that Scenario 5 — name + DOB + country all agreeing,
-// network completely disjoint — flips from FLAG to CLEAR. Per the build plan,
-// graph context is a flip mechanism for Scenario 5 only; other scenarios are
-// not affected because they don't reach the high-baseline branch.
+// The contextScore is added directly to the total log-odds. The penalty for
+// disjoint networks scales with the minimum neighbor count on either side:
+// more evidence of separate lives → stronger penalty. This means a pair
+// where both sides have 8+ counterparties and share ZERO produces a heavier
+// penalty than a pair where one side has only 2 known counterparties.
 
 import type { Customer, GraphData, GraphResult, WatchlistEntry } from '@/types';
 
@@ -32,9 +32,14 @@ export function computeGraphContext(
     // nothing rather than an uninformed penalty.
     contextScore = 0;
   } else if (shared.length === 0) {
-    // Two well-connected nodes with no overlapping neighbors. This is the
-    // "different person with same name" signal.
-    contextScore = -28;
+    // Two well-connected nodes with no overlapping neighbors. Penalty scales
+    // with the weaker side's neighbor count — the more relationships we can
+    // see without any overlap, the stronger the disjointness evidence.
+    const minNeighbors = Math.min(
+      customerNeighbors.length,
+      watchlistNeighbors.length,
+    );
+    contextScore = -3.5 * minNeighbors;
   } else if (shared.length === 1) {
     contextScore = +1.5;
   } else {

@@ -539,7 +539,7 @@ export const watchlist: WatchlistEntry[] = [
     fullName: 'Yusuf Ali',
     givenNames: ['Yusuf'],
     familyName: 'Ali',
-    dob: '1985',
+    dob: '1975',
     country: 'SO',
     nationality: 'SO',
     entityType: 'natural_person',
