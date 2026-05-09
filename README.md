@@ -27,7 +27,6 @@ This is partly due to naming patterns in the Arabic language itself, some of whi
 | Nasab chains (multi-generational lineage)                   | Long names with many matchable substrings; more tokens, more collision surface                                                              |
 | Transliteration variability                                 | عبدالله → Abdullah / Abdallah / Abd Allah / Abdulla — each a valid romanization                                                             |
 | Honorifics and religious titles                             | Additional tokens that may or may not appear on lists                                                                                       |
-As crude as it seems, name-matching alone has proven sufficient to trigger false flags at scale, to the point that debanking becomes logical.
 
 > As the payment platform switched to the large bank's compliance software, 50 percent of LaunchGood's donors in the United Kingdom were rejected. **When they prodded further, they found that they had "too many Muslim and Arabic names" that were throwing off their software.** Sadly, yet predictably, six months later, they received an email from their account manager at the platform saying their parent bank had made the decision to offboard LaunchGood. Similarly to the previous payment platform, there was no justification, warning, nor opportunity to challenge the decision. — https://www.aljazeera.com/opinions/2023/4/4/banking-as-an-american-muslim-its-a-horror
 
