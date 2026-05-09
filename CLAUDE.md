@@ -44,6 +44,9 @@ The owner's position: this is a **screening engine demonstration**, not a teachi
 | `src/components/EntityResolutionResult.tsx` | ER card: "Fellegi-Sunter threshold 50%, Matched against, Match probability, verdict". |
 | `src/components/MechanismPanel.tsx` | Expandable weight table showing per-field m/u/weight. |
 | `src/components/GraphPanel.tsx` | Network visualization for any customer-watchlist pair. |
+| `src/components/ApiSection.tsx` | Brief API section on the demo page. |
+| `api/screen.ts` | Cloudflare Pages Function source — POST /api/screen. |
+| `build-api.mjs` | esbuild bundler: api/screen.ts → functions/api/screen.js with @/ alias resolution. |
 
 ### The 6 scenarios
 
@@ -91,6 +94,17 @@ This entry's DOB was changed from 1985 to 1975 to avoid matching DB Yusuf Ali's 
 4. **Graph context 0.0% problem**: Fixed -28 penalty crushed all 20 customers to 0.0%. Fix: scale by min(neighbors).
 5. **Occupation bias**: Early version had 8/20 profiles as delivery drivers/taxi drivers/restaurant owners. Owner called this out as prejudice. Fix: changed to professional roles.
 6. **ER card inconsistency**: Scenario 6 showed a simplified "No hit" card instead of the full Fellegi-Sunter card. Fix: always render EntityResolutionResult using pairedEntityResolution.
+
+## API layer
+
+- **Endpoint**: `POST /api/screen` — Cloudflare Pages Function
+- **Source**: `api/screen.ts` → bundled by `build-api.mjs` → `functions/api/screen.js`
+- **Build**: `node build-api.mjs` (included in `npm run build`)
+- **Bundler**: esbuild with custom `@/` alias resolution plugin that finds `.ts` files
+- **Output**: `functions/` directory (gitignored — generated at build time)
+- **CORS**: Open (`*`) for demo purposes
+- **Logic**: Same watchlist sweep + paired ER as the client — accepts `{ fullName, dob?, country?, entityType?, counterparties? }`, returns legacy + ER verdicts with full weight breakdown
+- **No-match case**: Returns `{ error: "No match", details: "..." }` with status 200 (not 404)
 
 ## Production gaps (owner-approved roadmap, in priority order)
 

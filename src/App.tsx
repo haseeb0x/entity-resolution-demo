@@ -1,3 +1,4 @@
+import { ApiSection } from '@/components/ApiSection';
 import { Demo } from '@/components/Demo';
 import { Hook } from '@/components/Hook';
 import { HowItWorks } from '@/components/HowItWorks';
@@ -10,6 +11,8 @@ export default function App() {
       <Demo />
       <hr className="border-soft" />
       <HowItWorks />
+      <hr className="border-soft" />
+      <ApiSection />
       <Footer />
     </main>
   );
